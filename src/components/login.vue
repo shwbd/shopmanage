@@ -29,28 +29,30 @@ export default {
     }
   },
   methods: {
-    handlelogin () {
-      this.$http.post(`login`, this.formdata)
-        .then(res => {
-          console.log(res)
+    async handlelogin () {
+      const res = await this.$http.post(`login`, this.formdata)
+      // .then(res => {
+        console.log(res)
 
-          const {
-              data:{
-                  data,
-                  meta:{msg,status}
-              }
-          }=res
-          if (status===200) {
-              console.log('成功');
-
-          }else{
-              console.log('error');
-              
-          }
+      const {
+        data: {
+          data:{token},
+          meta: {msg, status}
+        }
+      } = res
+      localStorage.setItem('token', token)
+      if (status === 200) {
+        this.$router.push({
+          name: 'home'
         })
-        .catch(err => {
-          console.log(err)
-        })
+        console.log('成功')
+      } else {
+        this.$message.error(msg)
+      }
+      // })
+      // .catch(err => {
+      //   console.log(err)
+      // })
     }
   }
 }
