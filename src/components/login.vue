@@ -32,11 +32,11 @@ export default {
     async handlelogin () {
       const res = await this.$http.post(`login`, this.formdata)
       // .then(res => {
-        console.log(res)
+      console.log(res)
 
       const {
         data: {
-          data:{token},
+          data: {token},
           meta: {msg, status}
         }
       } = res
