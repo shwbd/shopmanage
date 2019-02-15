@@ -24,16 +24,27 @@
         <el-table-column prop="email" label="邮箱" width="140"></el-table-column>
         <el-table-column prop="mobile" label="电话" width="140"></el-table-column>
 
-
-
         <el-table-column label="创建日期" width="200">
-            <template slot-scope="scope">
-                {{scope.row.create_time|fmtdate}}
-            </template>
+          <template slot-scope="scope">{{scope.row.create_time|fmtdate}}</template>
         </el-table-column>
-        <el-table-column prop="address" label="用户状态" width="120"></el-table-column>
-        <el-table-column prop="address" label="操作" width="200"></el-table-column>
-
+        <el-table-column prop="address" label="用户状态" width="120">
+          <template slot-scope="scope">
+            <div>
+              <el-switch
+                v-model="scope.row.mg_state"
+                active-color="#13ce66"
+                inactive-color="#ff4949"
+              ></el-switch>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="address" label="操作" width="200">
+          <template slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" circle circle size = 'mini' plain></el-button>
+            <el-button type="success" icon="el-icon-check" circle circle size = 'mini' plain></el-button>
+            <el-button type="danger" icon="el-icon-delete" circle circle size = 'mini' plain></el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
   </div>
@@ -41,37 +52,43 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
-      query: '',
+      query: "",
       pagenum: 1,
       pagesize: 10,
       list: []
-    }
+    };
   },
   created() {
-    this.getTableData()
+    this.getTableData();
   },
   methods: {
     async getTableData() {
-    //   const AUTH_TOKEN = localStorage.getItem('token')
-    //   console.log(AUTH_TOKEN);
-      const AUTH_TOKEN = localStorage.getItem('token')
+      //   const AUTH_TOKEN = localStorage.getItem('token')
+      //   console.log(AUTH_TOKEN);
+      const AUTH_TOKEN = localStorage.getItem("token");
       console.log(AUTH_TOKEN);
-      
-      this.$http.defaults.headers.common['Authorization'] = AUTH_TOKEN;
-      const res = await this.$http.get(`users?query=${this.query}&pagenum=${this.pagenum}&pagesize=${this.pagesize}`)
-            console.log(res);
-            
-      const {data, meta: {status, msg}} = res.data;
-      if (status===200) {
-          this.list = data.users
-          console.log(this.list);
-          
+
+      this.$http.defaults.headers.common["Authorization"] = AUTH_TOKEN;
+      const res = await this.$http.get(
+        `users?query=${this.query}&pagenum=${this.pagenum}&pagesize=${
+          this.pagesize
+        }`
+      );
+      console.log(res);
+
+      const {
+        data,
+        meta: { status, msg }
+      } = res.data;
+      if (status === 200) {
+        this.list = data.users;
+        console.log(this.list);
       }
     }
   }
-}
+};
 </script>
 
 <style>
