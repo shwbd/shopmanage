@@ -11,10 +11,17 @@
       <!-- 搜索 -->
       <el-row class="searchBox">
         <el-col>
-          <el-input @clear='getAllUsers()' clearable placeholder="请输入内容" v-model="query" class="searchInput">
+          <el-input
+            @clear="getAllUsers()"
+            clearable
+            placeholder="请输入内容"
+            v-model="query"
+            class="searchInput"
+          >
             <el-button @click="searchUser()" slot="append" icon="el-icon-search"></el-button>
           </el-input>
-          <el-button type="primary">提交用户</el-button>
+          <el-button 
+          @click ='showDiaAddUse()' type="primary">添加用户</el-button>
         </el-col>
       </el-row>
       <!-- 表格 -->
@@ -38,25 +45,45 @@
             </div>
           </template>
         </el-table-column>
-       
+
         <el-table-column prop="address" label="操作" width="200">
-             <template slot-scope="scope">
-          <el-button type="primary" icon="el-icon-edit" circle size="mini" plain></el-button>
-          <el-button type="success" icon="el-icon-check" circle size="mini" plain></el-button>
-          <el-button type="danger" icon="el-icon-delete" circle size="mini" plain></el-button>
-        </template>
+          <template slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" circle size="mini" plain></el-button>
+            <el-button type="success" icon="el-icon-check" circle size="mini" plain></el-button>
+            <el-button type="danger" icon="el-icon-delete" circle size="mini" plain></el-button>
+          </template>
         </el-table-column>
       </el-table>
-       <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="pagenum"
-      :page-sizes="[2, 4, 6, 8]"
-      :page-size="2"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="10">
-    </el-pagination>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pagenum"
+        :page-sizes="[2, 4, 6, 8]"
+        :page-size="2"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="10"
+      ></el-pagination>
     </el-card>
+     <el-dialog title="收货地址" :visible.sync="dialogFormVisibleAdd">
+      <el-form label-position="left" label-width="80px" :model="formdata">
+        <el-form-item label="姓名">
+          <el-input v-model="formdata.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="formdata.password"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="formdata.email"></el-input>
+        </el-form-item>
+        <el-form-item label="电脑">
+          <el-input v-model="formdata.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisibleAdd = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisibleAdd = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -68,7 +95,14 @@ export default {
       pagenum: 1,
       pagesize: 2,
       total:-1,
-      list: []
+      list: [],
+      dialogFormVisibleAdd:false,
+      formdata:{
+          username:'',	
+          password:'',	
+          email:'',	
+          mobile:''
+      }
     };
   },
   created() {
@@ -77,6 +111,9 @@ export default {
     
   },
   methods: {
+      showDiaAddUse(){
+         this.dialogFormVisibleAdd = true;
+      },
       getAllUsers(){
           this.getTableData();
       },
