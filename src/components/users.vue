@@ -11,8 +11,8 @@
       <!-- 搜索 -->
       <el-row class="searchBox">
         <el-col>
-          <el-input placeholder="请输入内容" v-model="query" class="searchInput">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-input @clear='getAllUsers()' clearable placeholder="请输入内容" v-model="query" class="searchInput">
+            <el-button @click="searchUser()" slot="append" icon="el-icon-search"></el-button>
           </el-input>
           <el-button type="primary">提交用户</el-button>
         </el-col>
@@ -38,14 +38,24 @@
             </div>
           </template>
         </el-table-column>
+       
         <el-table-column prop="address" label="操作" width="200">
-          <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" circle circle size = 'mini' plain></el-button>
-            <el-button type="success" icon="el-icon-check" circle circle size = 'mini' plain></el-button>
-            <el-button type="danger" icon="el-icon-delete" circle circle size = 'mini' plain></el-button>
-          </template>
+             <template slot-scope="scope">
+          <el-button type="primary" icon="el-icon-edit" circle size="mini" plain></el-button>
+          <el-button type="success" icon="el-icon-check" circle size="mini" plain></el-button>
+          <el-button type="danger" icon="el-icon-delete" circle size="mini" plain></el-button>
+        </template>
         </el-table-column>
       </el-table>
+       <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pagenum"
+      :page-sizes="[2, 4, 6, 8]"
+      :page-size="2"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="10">
+    </el-pagination>
     </el-card>
   </div>
 </template>
@@ -56,17 +66,37 @@ export default {
     return {
       query: "",
       pagenum: 1,
-      pagesize: 10,
+      pagesize: 2,
+      total:-1,
       list: []
     };
   },
   created() {
-    this.getTableData();
+    // this.getTableData();
+    console.log('hahah');
+    
   },
   methods: {
+      getAllUsers(){
+          this.getTableData();
+      },
+      searchUser(){
+          this.pagenum = '1';
+          this.getTableData();
+      },
+       handleSizeChange(val) {
+        console.log(`每页 ${val} 条`);
+        this.pagenum = 1;
+       this.pagesize = val;
+       this.getTableData();
+      },
+      handleCurrentChange(val) {
+        console.log(`当前页: ${val}`);
+         this.pagenum = val;
+        this.getTableData();
+      },
     async getTableData() {
-      //   const AUTH_TOKEN = localStorage.getItem('token')
-      //   console.log(AUTH_TOKEN);
+      
       const AUTH_TOKEN = localStorage.getItem("token");
       console.log(AUTH_TOKEN);
 
@@ -84,6 +114,7 @@ export default {
       } = res.data;
       if (status === 200) {
         this.list = data.users;
+        this.total = data.total;
         console.log(this.list);
       }
     }
