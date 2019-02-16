@@ -20,7 +20,7 @@
           >
             <el-button @click="searchUser()" slot="append" icon="el-icon-search"></el-button>
           </el-input>
-          <el-button @click="showDiaAddUse()" type="primary">添加用户</el-button>
+          <el-button @click="showDiaAddUse()" type="primary"> 用户</el-button>
         </el-col>
       </el-row>
       <!-- 表格 -->
@@ -47,7 +47,8 @@
 
         <el-table-column prop="address" label="操作" width="200">
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" circle size="mini" plain></el-button>
+            <el-button 
+            @click ='showDiaEdUser(scope.row)' type="primary" icon="el-icon-edit" circle size="mini" plain></el-button>
             <el-button type="success" icon="el-icon-check" circle size="mini" plain></el-button>
             <el-button
               @click="showMsgBox(scope.row)"
@@ -90,11 +91,29 @@
         <el-button type="primary" @click="addUser()">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 对话框 编辑-->
+    <el-dialog title="收货地址" :visible.sync="dialogFormVisibleEdit">
+      <el-form label-position="left" label-width="80px" :model="formdata">
+        <el-form-item label="姓名">
+          <el-input disabled v-model="formdata.username"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="formdata.email"></el-input>
+        </el-form-item>
+        <el-form-item label="电脑">
+          <el-input v-model="formdata.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisibleEdit = false">取 消</el-button>
+        <el-button type="primary" @click="editUser()">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-export default {
+export default { 
   data() {
     return {
       query: "",
@@ -103,6 +122,7 @@ export default {
       total: -1,
       list: [],
       dialogFormVisibleAdd: false,
+      dialogFormVisibleEdit:false,
       formdata: {
         username: "",
         password: "",
@@ -115,19 +135,44 @@ export default {
     this.getTableData();
   },
   methods: {
+    async editUser(){
+        const res =await this.$http.put(`users/${this.formdata.id}`);
+      console.log(res);
+      const {meta:{msg,status}} = res.data;
+      if (status===200) {
+        this.dialogFormVisibleEdit = false; 
+        this.getTableData()
+      }
+      
+    },
+   showDiaEdUser(user){
+     
+// create_time: (...)
+// email: (...)
+// id: (...)
+// mg_state: (...)
+// mobile: (...)
+// role_name: (...)
+// username:
+     this.formdata = user; 
+    //  this.formdata.username = user.username;
+    //  this.formdata.password = user.password;
+    //  this.formdata.username = user.username;
+
+  this.dialogFormVisibleEdit = true;
+    },
     showMsgBox(user) {
       console.log(user);
-
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(async () => {
-          const res = await this.$http.delete(`users/:id`);
+          const res = await this.$http.delete(`users/${user.id}`,this.formdata);
 
           const {
-            meta: { msg, status }
+            meta:{ msg, status }
           } = res.data;
           if (status === 200) {
             this.$message.success(msg);
@@ -140,10 +185,11 @@ export default {
         });
     },
     async addUser() {
-      this.formdata.username = {};
+      // this.formdata.username = {};
       const res = await this.$http.post(`users`, this.formdata);
       console.log(res);
       this.dialogFormVisibleAdd = false;
+      this.getTableData();
     },
     showDiaAddUse() {
       this.dialogFormVisibleAdd = true;
