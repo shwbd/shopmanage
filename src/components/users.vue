@@ -113,12 +113,14 @@
     <el-dialog title="分配角色" :visible.sync="dialogFormVisibleRole">
   <el-form :model="formdata" label-position="left" label-width="80px">
     <el-form-item label="用户名">
-      <!-- <el-input v-model="form.name" autocomplete="off"></el-input> -->
       {{formdata.username}}
     </el-form-item>
-    <el-form-item label="活动区域" >
-      <el-select v-model="selectVal" placeholder="请选择输入名称">
-        <el-option label="请选择" value="shanghai"></el-option>
+    <el-form-item label="角色" >
+        {{selectVal}}
+      <el-select v-model="selectVal" placeholder="请选择角色名称">
+        <el-option label="请选择" :value="-1"></el-option>
+        <!-- <el-option :label="item.roleName" v-for='(item,i) in roles' :key ='item.id'></el-option> -->
+        <el-option :label="item.roleName" :value="item.id " v-for="(item,i) in roles" :key='item.id'></el-option>
       </el-select>
     </el-form-item>
   </el-form>
@@ -148,7 +150,8 @@ export default {
         email: "",
         mobile: ""
       },
-      selectVal:1
+      selectVal:-1,
+      roles:[],
     };
   },
   created() {
@@ -156,9 +159,18 @@ export default {
   },
   methods: {
     // 分配角色
-    showDiaSetRole(){
-      // const res =  
+   async showDiaSetRole(user){
+     this.formdata = user;
       this.dialogFormVisibleRole = true;
+      const res =await this.$http.get(`roles`)
+      // console.log(res);
+      const {meta:{msg,status},data}=res.data
+      if (status===200){
+        this.roles = data;
+        console.log(this.roles);
+        
+      }
+      
     },
    async changeState(user){
     //  console.log(user);
