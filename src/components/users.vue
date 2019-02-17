@@ -33,23 +33,23 @@
         <el-table-column label="创建日期" width="200">
           <template slot-scope="scope">{{scope.row.create_time|fmtdate}}</template>
         </el-table-column>
-        <el-table-column prop="address" label="用户状态" width="120">
+        <el-table-column label="用户状态" width="120">
           <template slot-scope="scope">
-            <div>
               <el-switch
+              @change='changeState(scope.row)'
                 v-model="scope.row.mg_state"
                 active-color="#13ce66"
                 inactive-color="#ff4949"
               ></el-switch>
-            </div>
           </template>
         </el-table-column>
 
-        <el-table-column prop="address" label="操作" width="200">
+        <el-table-column label="操作" width="200">
           <template slot-scope="scope">
             <el-button 
             @click ='showDiaEdUser(scope.row)' type="primary" icon="el-icon-edit" circle size="mini" plain></el-button>
-            <el-button type="success" icon="el-icon-check" circle size="mini" plain></el-button>
+            <el-button 
+            @click="showDiaSetRole(scope.row)" type="success" icon="el-icon-check" circle size="mini" plain></el-button>
             <el-button
               @click="showMsgBox(scope.row)"
               type="danger"
@@ -82,7 +82,7 @@
         <el-form-item label="邮箱">
           <el-input v-model="formdata.email"></el-input>
         </el-form-item>
-        <el-form-item label="电脑">
+        <el-form-item label="电话 ">
           <el-input v-model="formdata.mobile"></el-input>
         </el-form-item>
       </el-form>
@@ -109,6 +109,24 @@
         <el-button type="primary" @click="editUser()">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 对话框 -->
+    <el-dialog title="分配角色" :visible.sync="dialogFormVisibleRole">
+  <el-form :model="formdata" label-position="left" label-width="80px">
+    <el-form-item label="用户名">
+      <!-- <el-input v-model="form.name" autocomplete="off"></el-input> -->
+      {{formdata.username}}
+    </el-form-item>
+    <el-form-item label="活动区域" >
+      <el-select v-model="selectVal" placeholder="请选择输入名称">
+        <el-option label="请选择" value="shanghai"></el-option>
+      </el-select>
+    </el-form-item>
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogFormVisibleRole">取 消</el-button>
+    <el-button type="primary" @click="dialogFormVisibleRole = false">确 定</el-button>
+  </div>
+</el-dialog>
   </div>
 </template>
 
@@ -123,18 +141,32 @@ export default {
       list: [],
       dialogFormVisibleAdd: false,
       dialogFormVisibleEdit:false,
+      dialogFormVisibleRole:false,
       formdata: {
         username: "",
         password: "",
         email: "",
         mobile: ""
-      }
+      },
+      selectVal:1
     };
   },
   created() {
     this.getTableData();
   },
   methods: {
+    // 分配角色
+    showDiaSetRole(){
+      // const res =  
+      this.dialogFormVisibleRole = true;
+    },
+   async changeState(user){
+    //  console.log(user);
+     
+     const res = await this.$http.put(`users/${user.id}/state/${user.mg_state}`)
+    //  console.log(res);
+     
+    },
     async editUser(){
         const res =await this.$http.put(`users/${this.formdata.id}`);
       console.log(res);
